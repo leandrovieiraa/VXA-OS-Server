@@ -7,7 +7,7 @@ Tópico original: [Aldeia RPG](http://www.aldeiarpg.com/t13748-vxa-os-crie-seu-m
 
 - Autor: Valentine
 - Mod: Gallighanmaker (Leandro Vieira)
-- Versão: 1.0.8
+- Versão: 1.0.7
 - Client: RPG Maker VX Ace
 - [Ruby + Devkit 2.5.3-1 (x64)](https://rubyinstaller.org/downloads/)
 
