@@ -1,5 +1,7 @@
 # VXA-OS-Server
-VXA-OS Server with MySQL Support [Aldeia RPG](http://www.aldeiarpg.com/t13748-vxa-os-crie-seu-mmo-com-rpg-maker)
+
+**VXA-OS Custom Server** com suporte ao banco de dados **MySQL**.
+Tópico original: [Aldeia RPG](http://www.aldeiarpg.com/t13748-vxa-os-crie-seu-mmo-com-rpg-maker)
 
 ![VXA-OS Logo](https://i.imgur.com/vmblUfr.png)
 
