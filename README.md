@@ -52,6 +52,9 @@ VXA-OS é uma estrutura gratuita de criação de jogos on-line 2D. Atualmente, �
 - Grava todas as informações de contas, jogadores, bancos, switches, variaveis no banco de dados
 - Self-deleted para os personagens, não ocasionando perda de dados e para futuros sistemas
 
+### Discord
+[Link](https://discord.gg/cVhjdsF)
+
 ### Como configurar
 -
 -
