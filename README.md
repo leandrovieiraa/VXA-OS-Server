@@ -58,3 +58,10 @@ VXA-OS é uma estrutura gratuita de criação de jogos on-line 2D. Atualmente, �
 ### Como configurar
 -
 -
+
+### Licença
+VXA-OS é uma estrutura livre de código aberto, distribuído sob uma licença muito liberal (a conhecida licença MIT). O projeto pode ser usado para quaisquer propósitos, incluindo finalidades comerciais, sem qualquer custo ou burocracia.
+
+VXA-OS não é de domínio público e o seu criador mantém seus direitos autorais. O único requisito é que, se você usar o VXA-OS, deverá dar crédito ao criador ao incluir o aviso de direitos autorais em algum lugar de seu jogo.
+
+Em nenhuma circunstância, o autor ou proprietário de direitos de autor poderá ser responsabilizado por quaisquer reivindicações, danos ou outras responsabilidades.
