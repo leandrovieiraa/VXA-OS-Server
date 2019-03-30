@@ -34,7 +34,7 @@ module Send_Data
 			buffer.write_string(actor.character_name)
 			buffer.write_byte(actor.character_index)
 			actor.equips.each { |equip| buffer.write_short(equip) }
-		end
+		end		
 		client.send_data(buffer.to_s)
 	end
 
@@ -143,7 +143,6 @@ module Send_Data
 	end
 
 	def send_player_data(client, actor, map_id)
-		puts "here in send_player_data, #{map_id}"
 		return if @maps[map_id].zero_players?
 		buffer = Buffer_Writer.new
 		buffer.write_byte(Constants::PACKET_PLAYER_DATA)
