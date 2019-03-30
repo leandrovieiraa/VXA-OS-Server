@@ -60,3 +60,4 @@ Logs/*.*
 configs.ini
 quests.ini
 motd.txt
+Database/config.json

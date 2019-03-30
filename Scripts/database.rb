@@ -17,9 +17,9 @@ module Database
 
 		# Conecta no banco de dados usando as informações carregadas do arquivo config.
 		if(!use_database)
-			mysql_client = Mysql2::Client.new(:host => config["host"], :username => config["user"], :password => config["pass"])
+			mysql_client = Mysql2::Client.new(:host => config["host"], :port => config["port"], :username => config["user"], :password => config["pass"])
 		else
-			mysql_client = Mysql2::Client.new(:host => config["host"], :username => config["user"], :password => config["pass"], :database => "vxaos_srv")
+			mysql_client = Mysql2::Client.new(:host => config["host"], :port => config["port"], :username => config["user"], :password => config["pass"], :database => "vxaos_srv")
 		end
 
 		# Retorna o objeto de conexao funcional
