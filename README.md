@@ -78,6 +78,7 @@ Todas as mudanças foram comentadas para identificar e para um melhor entendimen
     - Em ambiente **Windows** ou **Linux** instale as **gem's**
       - gem install eventmachine
       - gem install mysql2
+        - No **Windows** é um pouco complicado essa gem, então baixe esses arquivos [Mega.nz](https://mega.nz/#!6EITRQZI!p57BuU5o_OpIgRgxpWcdqZv8sOoE3mvwLUT6sDySM3A) e descompacte em alguma pasta. Após descompactar execute o seguinte comando para instalar: gem install mysql2 -- '--with-mysql-lib="**caminho_onde_extraiu**\lib" --with-mysql-include="**caminho_onde_extraiu**\include"
       - gem install json
       - gem install colorize
 - Instale o servidor MySQL 5.7 [Windows](https://dev.mysql.com/downloads/mysql/5.7.html), [Linux](https://www.digitalocean.com/community/tutorials/como-instalar-o-mysql-no-ubuntu-18-04-pt)
