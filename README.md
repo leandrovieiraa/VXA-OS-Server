@@ -56,6 +56,8 @@ VXA-OS é uma estrutura gratuita de criação de jogos on-line 2D. Atualmente, �
 
 Todas as mudanças foram comentadas para identificar e para um melhor entendimento, segue abaixo lista de scripts modificados
 
+- Main.rb
+  - Adicionado o método para criar o banco de dados
 - Database.rb
   - Contém todas as interações do banco de dados
 - Handle_data.rb
@@ -70,6 +72,14 @@ Todas as mudanças foram comentadas para identificar e para um melhor entendimen
 
 ### Como configurar
 - Instale o Ruby [Windows](https://rubyinstaller.org/downloads/), [Linux](https://www.brightbox.com/blog/2016/01/06/ruby-2-3-ubuntu-packages/)
+    - Em ambiente **Linux**, além de instalar o Ruby, precisa instalar outras depencencias como:
+      - sudo apt-get install build-essential patch
+      - sudo apt-get install ruby-dev zlib1g-dev liblzma-dev libffi-dev gcc make libmysqlclient-dev
+    - Em ambiente **Windows** ou **Linux** instale as **gem's**
+      - gem install eventmachine
+      - gem install mysql2
+      - gem install json
+      - gem install colorize
 - Instale o servidor MySQL 5.7 [Windows](https://dev.mysql.com/downloads/mysql/5.7.html), [Linux](https://www.digitalocean.com/community/tutorials/como-instalar-o-mysql-no-ubuntu-18-04-pt)
 - Renomeie o arquivo **Database/config.sample** para **Database/config.json**
 - Altere o arquivo **Database/config.json** com as informações do banco de dados
@@ -78,8 +88,10 @@ Todas as mudanças foram comentadas para identificar e para um melhor entendimen
   - user
   - password
 - Execute o script **main.rb** pelo terminal (cmd)
-  - ./main.rb
+  - ./main.rb ou ruby main.rb
   - O Script cria automaticamente o banco de dados e suas tabelas caso não existirem e com isso será iniciado.
+  - Ao utilizar **Linux** execute o comandoo: nohup ruby main.rb $
+    - Com isso será executado em segundo plano, podendo sair do terminal ssh.
 
 ![Console](https://image.prntscr.com/image/wRhzM9LEQSudk_IcMw9rfg.png)
 
