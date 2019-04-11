@@ -2,17 +2,16 @@
 # ** Game_Account
 #------------------------------------------------------------------------------
 # Autor: Valentine
-# MySQL Plugin: Gallighanmaker
 #==============================================================================
 
 module Game_Account
 
-  	attr_reader   :id
+  attr_reader   :id
 	attr_reader   :ip
 	attr_writer   :handshake
-  	attr_accessor :user
-  	attr_accessor :pass
-  	attr_accessor :email
+  attr_accessor :user
+  attr_accessor :pass
+  attr_accessor :email
 	attr_accessor :group
 	attr_accessor :actors
 
@@ -39,6 +38,10 @@ module Game_Account
 
 	def in_game?
 		@actor_id >= 0
+	end
+
+	def standard?
+		@group == Constants::GROUP_STANDARD
 	end
 	
 	def admin?
@@ -183,7 +186,7 @@ module Game_Account
 		actor.variables = @variables
 		actor.self_switches = @self_switches
 		Database.save_player(actor)
-		Database.save_bank(self, actor) # Adicionado objeto "actor" para salvar o banco
+		Database.save_bank(self, actor) # foi adicionado o objeto "actor"
 	end
 
 	def update_menu

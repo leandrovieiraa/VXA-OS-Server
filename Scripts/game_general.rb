@@ -46,7 +46,7 @@ module Game_General
 		return false
 	end
 
-  def forbidden_name?(name)
+  def illegal_name?(name)
     FORBIDDEN_NAMES.any? { |word| name =~ /#{word}/i }
 	end
 	
@@ -73,58 +73,49 @@ module Game_General
 		message
 	end
 	
-	def admin_commands(client, message)
-		index = message.index(' ')
-		return unless index
-		@log.add('Admin', :blue, "#{client.user} executou o comando: #{message}")
-		command = message[0, index]
-		data = message[index + 1, message.size]
+	def admin_commands(client, command, str1, str2, str3, str4)
+		#@log.add('Admin', :blue, "#{client.user} executou o comando: #{message}")
 		case command
-		when '/kick'
-			kick_player(client, data)
-		when '/teleport'
-			teleport_player(client, data)
-		when '/go'
-			go_to_player(client, data)
-		when '/pull'
-			pull_player(client, data)
-		when '/item'
-			give_item(client, $data_items, data)
-		when '/weapon'
-			give_item(client, $data_weapons, data)
-		when '/armor'
-			give_item(client, $data_armors, data)
-		when '/banip'
-			ban(client, Constants::COMMAND_IP_BANNED, data)
-		when '/ban'
-			ban(client, Constants::COMMAND_ACC_BANNED, data)
-		when '/unban'
-			unban(data)
-		when '/switch'
-			switch_id, value = *data.split
-			change_global_switch(switch_id.to_i, value == 'true')
-		when '/motd'
-			change_motd(data)
-		when '/mute'
-			mute(client, data)
+		when Constants::COMMAND_KICK
+			kick_player(client, str1)
+		when Constants::COMMAND_TELEPORT
+			teleport_player(client, str1, str2, str3, str4)
+		when Constants::COMMAND_GO
+			go_to_player(client, str1)
+		when Constants::COMMAND_PULL
+			pull_player(client, str1)
+		when Constants::COMMAND_ITEM
+			give_item(client, $data_items, str1, str2, str3)
+		when Constants::COMMAND_WEAPON
+			give_item(client, $data_weapons, str1, str2, str3)
+		when Constants::COMMAND_ARMOR
+			give_item(client, $data_armors, str1, str2, str3)
+		when Constants::COMMAND_BAN_IP
+			ban(client, Constants::COMMAND_IP_BANNED, str1, str2)
+		when Constants::COMMAND_BAN_ACC
+			ban(client, Constants::COMMAND_ACC_BANNED, str1, str2)
+		when Constants::COMMAND_UNBAN
+			unban(str1)
+		when Constants::COMMAND_SWITCH
+			change_global_switch(str1.to_i, str2 == 1)
+		when Constants::COMMAND_MOTD
+			change_motd(str1)
+		when Constants::COMMAND_MUTE
+			mute_player(client, str1)
 		else
 			alert_message(client, Constants::ALERT_INVALID_COMMAND)
 		end
 	end
 
-	def monitor_commands(client, message)
-		index = message.index(' ')
-		return unless index
-		@log.add('Monitor', :blue, "#{client.user} executou o comando: #{message}")
-		command = message[0, index]
-		data = message[index + 1, message.size]
+	def monitor_commands(client, command, str1, str2, str3, str4)
+		#@log.add('Monitor', :blue, "#{client.user} executou o comando: #{message}")
 		case command
-		when '/go'
-			go_to_player(client, data)
-		when '/pull'
-			pull_player(client, data)
-		when '/mute'
-			mute(client, data)
+		when Constants::COMMAND_GO
+			go_to_player(client, str1)
+		when Constants::COMMAND_PULL
+			pull_player(client, str1)
+		when Constants::COMMAND_MUTE
+			mute_player(client, str1)
 		else
 			alert_message(client, Constants::ALERT_INVALID_COMMAND)
 		end
@@ -141,17 +132,7 @@ module Game_General
 		player.disconnect
 	end
 
-	def teleport_player(client, data)
-		# Retorna no máximo 4 campos, ainda que o nome do jogador seja composto
-		data = data.split(' ', 4)
-		if data.size < 4
-			alert_message(client, Constants::ALERT_INVALID_COMMAND)
-			return
-		end
-		map_id = data[0].to_i
-		x = data[1].to_i
-		y = data[2].to_i
-		name = data[3]
+	def teleport_player(client, name, map_id, x, y)
 		@clients.each do |player|
 			next unless player
 			if name == 'all' && player.in_game?
@@ -188,40 +169,25 @@ module Game_General
 		end
 	end
 
-	def give_item(client, items, data)
-		data = data.split(' ', 3)
-		if data.size < 3
-			alert_message(client, Constants::ALERT_INVALID_COMMAND)
-			return
-		end
-		item_id = data[0].to_i
-		amount = data[1].to_i
-		name = data[2]
+	def give_item(client, items, name, item_id, amount)
 		@clients.each do |client|
 			next unless client
 			if name == 'all' && client.in_game?
-				client.gain_item(items[item_id], amount)
-				alert_message(client, Constants::ALERT_GAIN_ITEM)
+				client.gain_item(items[item_id], amount, false, true)
 			elsif client.name.casecmp(name).zero?
-				client.gain_item(items[item_id], amount)
-				alert_message(client, Constants::ALERT_GAIN_ITEM)
+				client.gain_item(items[item_id], amount, false, true)
 				break
 			end
 		end
 	end
 
-	def ban(client, type, data)
-		data = data.split(' ', 2)
-		if data.size < 2
-			alert_message(client, Constants::ALERT_INVALID_COMMAND)
-			return
-		end
-		player = find_player(data[1])
+	def ban(client, type, name, days)
+		player = find_player(name)
 		if !player || player.admin?
 			alert_message(client, Constants::ALERT_INVALID_NAME)
 			return
 		end
-		time = data[0].to_i * 86400 + Time.now.to_i
+		time = days * 86400 + Time.now.to_i
 		global_message("#{player.name} foi banido.")
 		if type == Constants::COMMAND_ACC_BANNED
 			@ban_list[player.user.downcase] = time
@@ -257,7 +223,7 @@ module Game_General
 		global_message(motd)
 	end
 
-	def mute(client, name)
+	def mute_player(client, name)
 		player = find_player(name)
 		if !player || player.admin?
 			alert_message(client, Constants::ALERT_INVALID_NAME)

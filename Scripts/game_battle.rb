@@ -191,6 +191,8 @@ class Game_Client < EventMachine::Connection
     consume_item(item) if item.is_a?(RPG::Item)
     item.effects.each { |effect| item_global_effect_apply(effect) }
     case item.scope
+    when Constants::ITEM_SCOPE_ALL_ALLIES
+      item_party_recovery(item)
     when Constants::ITEM_SCOPE_ENEMY..Constants::ITEM_SCOPE_ALLIES_KNOCKED_OUT
       item_attack_normal(item)
     when Constants::ITEM_SCOPE_USER
@@ -285,15 +287,15 @@ module Game_Enemy
   end
 
   def treasure
+    # Amount será um número inteiro, ainda que o ouro seja 0 e em razão
+    #disso o rand retorne um valor decimal 
+    $server.clients[@target.id].gain_gold(rand(enemy.gold).to_i, false, true)
     if $server.clients[@target.id].in_party?
       $server.clients[@target.id].party_share_exp(enemy.exp * EXP_BONUS, @enemy_id)
     else
       $server.clients[@target.id].gain_exp(enemy.exp * EXP_BONUS)
       $server.clients[@target.id].add_kills_count(@enemy_id)
     end
-    # Amount será um número inteiro, ainda que o ouro seja 0 e em razão
-    #disso o rand retorne um valor decimal 
-    $server.clients[@target.id].gain_gold(rand(enemy.gold).to_i, false, true)
     drop_items
   end
 
@@ -306,12 +308,12 @@ module Game_Enemy
   end
 
   def disable
+    $server.clients[@target.id].change_variable(enemy.disable_variable_id, $server.clients[@target.id].variables[enemy.disable_variable_id] + 1) if enemy.disable_variable_id > 0
     if enemy.disable_switch_id >= MAX_PLAYER_SWITCHES
-      $server.change_global_switch(enemy.disable_switch_id, !$server.switches[enemy.disable_switch_id])
+      $server.change_global_switch(enemy.disable_switch_id, !$server.switches[enemy.disable_switch_id - MAX_PLAYER_SWITCHES])
     elsif enemy.disable_switch_id > 0
       $server.clients[@target.id].change_switch(enemy.disable_switch_id, !$server.clients[@target.id].switches[enemy.disable_switch_id])
     end
-    $server.clients[@target.id].change_variable(enemy.disable_variable_id, $server.clients[@target.id].variables[enemy.disable_variable_id] + 1) if enemy.disable_variable_id > 0
   end
 
   def change_position

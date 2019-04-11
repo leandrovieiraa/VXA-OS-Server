@@ -21,20 +21,23 @@ module Send_Data
 	def send_login(client)
 		buffer = Buffer_Writer.new
 		buffer.write_byte(Constants::PACKET_LOGIN)
-
+		
 		# Fix null actors in account
 		if client.actors == nil
 			client.actors = {}
 		end
 
+		buffer.write_byte(client.group)
 		buffer.write_byte(client.actors.size)
 		client.actors.each do |actor_id, actor|
 			buffer.write_byte(actor_id)
 			buffer.write_string(actor.name)
 			buffer.write_string(actor.character_name)
 			buffer.write_byte(actor.character_index)
+			buffer.write_string(actor.face_name)
+			buffer.write_byte(actor.face_index)
 			actor.equips.each { |equip| buffer.write_short(equip) }
-		end		
+		end
 		client.send_data(buffer.to_s)
 	end
 
@@ -59,6 +62,8 @@ module Send_Data
 		buffer.write_string(actor.name)
 		buffer.write_string(actor.character_name)
 		buffer.write_byte(actor.character_index)
+		buffer.write_string(actor.face_name)
+		buffer.write_byte(actor.face_index)
 		actor.equips.each { |equip| buffer.write_short(equip) }
 		client.send_data(buffer.to_s)
 	end
@@ -80,7 +85,6 @@ module Send_Data
 		buffer = Buffer_Writer.new
 		buffer.write_byte(Constants::PACKET_USE_CHAR)
 		buffer.write_short(client.id)
-		buffer.write_byte(client.group)
 		buffer.write_string(client.name)
 		buffer.write_string(client.character_name)
 		buffer.write_byte(client.character_index)
@@ -112,9 +116,11 @@ module Send_Data
 		end
 		buffer.write_byte(client.skills.size)
 		client.skills.each { |skill| buffer.write_short(skill) }
-		quests = client.quests_in_progress
-		buffer.write_byte(quests.size)
-		quests.each_key { |quest_id| buffer.write_byte(quest_id) }
+		buffer.write_byte(client.quests.size)
+		client.quests.each do |quest_id, quest|
+			buffer.write_byte(quest_id)
+			buffer.write_byte(quest.state)
+		end
 		client.hotbar.each do |hotbar|
 			buffer.write_byte(hotbar.type)
 			buffer.write_short(hotbar.item_id)
@@ -428,13 +434,14 @@ module Send_Data
 		client.send_data(buffer.to_s)
 	end
 
-	def send_player_item(client, item_id, kind, amount, drop_sound)
+	def send_player_item(client, item_id, kind, amount, drop_sound, popup)
     buffer = Buffer_Writer.new
 		buffer.write_byte(Constants::PACKET_PLAYER_ITEM)
 		buffer.write_short(item_id)
 		buffer.write_byte(kind)
 		buffer.write_short(amount)
 		buffer.write_boolean(drop_sound)
+		buffer.write_boolean(popup)
 		client.send_data(buffer.to_s)
 	end
 

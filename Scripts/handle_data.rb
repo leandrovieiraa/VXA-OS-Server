@@ -2,7 +2,6 @@
 # ** Handle_Data
 #------------------------------------------------------------------------------
 # Autor: Valentine
-# MySQL Plugin: Gallighanmaker
 #==============================================================================
 
 module Handle_Data
@@ -96,6 +95,8 @@ module Handle_Data
 			handle_trade_gold(client, buffer)
 		when Constants::PACKET_CLOSE_TRADE
 			handle_close_trade(client)
+		when Constants::PACKET_ADMIN_COMMAND
+			handle_admin_command(client, buffer)
 		else
 			extension_messages_game(client, header, buffer)
 		end
@@ -137,8 +138,9 @@ module Handle_Data
 		client.group = account.group
 		client.actors = account.actors
 		client.handshake = true
-		Database.load_bank(client, account) # Foi adicionado o objeto "account"
+		Database.load_bank(client, account) # foi adicionado o objeto "account"
 		send_login(client)
+		puts("#{user} logou com o IP #{client.ip}.")
 	end
 
 	def handle_new_account(client, buffer)
@@ -162,6 +164,7 @@ module Handle_Data
 		Database.create_account(user, pass, email)
 		send_new_account(client, Constants::REGISTER_SUCCESSFUL)
 		client.disconnect
+		puts("Conta #{user} criada.")
 	end
 
 	def handle_new_character(client, buffer)
@@ -178,7 +181,7 @@ module Handle_Data
 		return if client.actors.has_key?(actor_id)
 		return if name.size < MIN_CHARACTERS || name.size > MAX_CHARACTERS
 		#return if invalid_name?(name)
-		return if forbidden_name?(name)
+		return if illegal_name?(name) && client.standard?
 		return if class_id < 1 || class_id > MAX_CLASSES
 		return if sex > Constants::SEX_FEMALE
 		return if character_index >= $data_classes[class_id].graphics[sex].size
@@ -244,14 +247,6 @@ module Handle_Data
 		if message == '/who'
 			whos_online(client)
 			return
-		elsif message.start_with?('/')
-			if client.admin?
-				admin_commands(client, message)
-				return
-			elsif client.monitor?
-				monitor_commands(client, message)
-				return
-			end
 		end
 		message = "#{client.name}: #{chat_filter(message)}"
 		case talk_type
@@ -335,7 +330,7 @@ module Handle_Data
 		#return unless client.in_range?(drop, 1)
 		return unless client.pos?(drop.x, drop.y)
 		item = client.item_object(drop.kind, drop.item_id)
-		client.gain_item(item, drop.amount, true)
+		client.gain_item(item, drop.amount, true, true)
 		@maps[client.map_id].remove_drop(drop_id)
 	end
 
@@ -533,6 +528,19 @@ module Handle_Data
 	
 	def handle_close_trade(client)
 		client.close_trade
+	end
+
+	def handle_admin_command(client, buffer)
+		command = buffer.read_byte
+		str1 = buffer.read_string
+		str2 = buffer.read_short
+		str3 = buffer.read_short
+		str4 = buffer.read_short
+		if client.admin?
+			admin_commands(client, command, str1, str2, str3, str4)
+		elsif client.monitor?
+			monitor_commands(client, command, str1, str2, str3, str4)
+		end
 	end
 
 end

@@ -107,6 +107,14 @@ class Game_Client < EventMachine::Connection
 		@muted_time > Time.now
 	end
 
+	def quest_in_progress?(quest_id)
+		@quests[quest_id]&.in_progress?
+	end
+
+	def quest_finished?(quest_id)
+		@quests[quest_id]&.finished?
+	end
+
 	def weapon_id
 		@equips[Constants::EQUIP_WEAPON]
 	end
@@ -131,12 +139,12 @@ class Game_Client < EventMachine::Connection
 		@direction = direction
 	end
 
-	def save_point(map_id, x, y)
+	def check_point(map_id, x, y)
 		@revive_map_id = map_id
 		@revive_x = x
 		@revive_y = y
 	end
-
+	
 	def hp=(hp)
 		@hp = [[hp, mhp].min, 0].max
 		if dead?
@@ -355,7 +363,7 @@ class Game_Client < EventMachine::Connection
 		include_equip ? @equips.include?(item.id) : false
 	end
 
-	def gain_item(item, amount, drop_sound = false)
+	def gain_item(item, amount, drop_sound = false, popup = false)
 =begin
 		if amount > 0 && full_inventory? && !has_item?(item)
 			$server.alert_message(self, Constants::ALERT_FULL_INV)
@@ -366,7 +374,7 @@ class Game_Client < EventMachine::Connection
 		return unless container
 		container[item.id] = [[item_number(item) + amount].max, MAX_ITEMS].min
 		container.delete(item.id) if container[item.id] == 0
-		$server.send_player_item(self, item.id, kind_item(item), amount, drop_sound)
+		$server.send_player_item(self, item.id, kind_item(item), amount, drop_sound, popup)
 		check_completed_quests
 	end
 
@@ -465,17 +473,13 @@ class Game_Client < EventMachine::Connection
 		item = item_object(@quests[quest_id].item_kind, @quests[quest_id].item_id)
 		lose_item(item,  @quests[quest_id].item_amount)
 		item = item_object(@quests[quest_id].reward.item_kind, @quests[quest_id].reward.item_id)
-		gain_item(item, @quests[quest_id].reward.item_amount)
-		gain_gold(@quests[quest_id].reward.gold)
+		gain_gold(@quests[quest_id].reward.gold, false, true)
+		gain_item(item, @quests[quest_id].reward.item_amount, false, true)
 		gain_exp(@quests[quest_id].reward.exp)
 		@quests.delete(quest_id) if @quests[quest_id].repeat?
 		$server.send_finish_quest(self, quest_id)
 	end
-
-	def quests_in_progress
-		@quests.select { |quest_id, quest| quest.in_progress? }
-	end
-
+	
 	def accept_friend
 		return unless $server.clients[@request.id]&.in_game?
 		$server.clients[@request.id].add_friend(self)

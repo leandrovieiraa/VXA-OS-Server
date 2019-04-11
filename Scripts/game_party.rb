@@ -6,10 +6,14 @@
 
 module Game_Party
 
-  attr_accessor :party_id
+	attr_accessor :party_id
+	
+	def party_members_in_map
+		$server.parties[@party_id].select { |member| member.map_id == @map_id }
+	end
 
 	def party_share_exp(exp, enemy_id)
-  	party_members = $server.parties[@party_id].select { |member| member.map_id == @map_id }
+  	party_members = party_members_in_map
   	if party_members.size > exp
 			gain_exp(exp)
 			add_kills_count(enemy_id)
@@ -20,6 +24,16 @@ module Game_Party
 			member.gain_exp(exp_share)
 			member.add_kills_count(enemy_id)
 		end
+	end
+	
+	def item_party_recovery(item)
+		unless in_party?
+			item_recover(item)
+			return
+		end
+		party_members_in_map.each do |member|
+			member.item_recover(item)
+    end
   end
   
 	def accept_party

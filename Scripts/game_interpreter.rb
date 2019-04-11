@@ -268,17 +268,17 @@ class Game_Interpreter
 
   def change_item
     value = operate_value(@params[1], @params[2], @params[3])
-    @client.gain_item($data_items[@params[0]], value)
+    @client.gain_item($data_items[@params[0]], value, false, value > 0)
   end
 
   def change_weapon
     value = operate_value(@params[1], @params[2], @params[3])
-    @client.gain_item($data_weapons[@params[0]], value)
+    @client.gain_item($data_weapons[@params[0]], value, false, value > 0)
   end
 
   def change_armor
     value = operate_value(@params[1], @params[2], @params[3])
-    @client.gain_item($data_armors[@params[0]], value)
+    @client.gain_item($data_armors[@params[0]], value, false, value > 0)
   end
 
   def transfer_player
@@ -382,8 +382,8 @@ class Game_Interpreter
     @client.start_quest(quest_id)
   end
 
-  def save_point(map_id, x, y)
-    @client.save_point(map_id, x, y)
+  def check_point(map_id, x, y)
+    @client.check_point(map_id, x, y)
   end
 
   def open_bank

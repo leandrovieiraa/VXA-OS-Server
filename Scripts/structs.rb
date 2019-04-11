@@ -2,7 +2,6 @@
 # ** Structs
 #------------------------------------------------------------------------------
 # Autor: Valentine
-# MySQL Plugin: Gallighanmaker
 #==============================================================================
 
 Hotbar = Struct.new(
@@ -44,7 +43,7 @@ Reward = Struct.new(
 
 Account = Struct.new(
 	:account_id, # Novo atributo para o MySQL Plugin
-	:user,
+	:user, # Novo atributo para o MySQL Plugin
 	:pass,
 	:email,
 	:group,
